@@ -75,7 +75,7 @@ st.title("🗑️ Waste Management Admin Dashboard")
 st.markdown("---")
 
 # Tabs for different sections
-tab1, tab2, tab3, tab4 = st.tabs(["Dustbin Location", "History", "Reward Calculator", "Notifications"])
+tab1, tab2, tab3, tab4, tab5 = st.tabs(["Dustbin Location", "Notifications", "Reward Calculator", "History", "Smartbin Installation Order"])
 
 # Tab 1: Address List
 with tab1:
@@ -116,39 +116,24 @@ with tab1:
     else:
         st.info("No dustbin records found in database.")
 
-# Tab 2: History (formerly Completion Tracker)
+# Tab 2: Notifications
 with tab2:
-    st.header("Recycle History")
+    st.header("Notifications")
     
-    col1, col2 = st.columns(2)
-    
-    if not collect_rubbish_df.empty:
-        # Show full collection history
-        st.subheader("Collection Records")
-        display_df = collect_rubbish_df.copy()
-        display_df = display_df.drop(['_id', 'image'], axis=1, errors='ignore')
-        display_df.columns = ['Dustbin ID', 'Time', 'Rubbish Type', 'Weight (kg)', 'Price (RM)']
-        st.dataframe(display_df, use_container_width=True)
+    if not notification_df.empty:
+        # Display notifications
+        uncollected_df = notification_df[notification_df['isCollected'] == False]
 
-        # Rubbish type weight summary
-        st.subheader("Total Weight by Rubbish Type")
-
-        weight_summary = collect_rubbish_df.groupby("rubbish_type")["weight"].sum().reset_index()
-        weight_summary.columns = ["Rubbish Type", "Total Weight (kg)"]
-
-        fig = px.bar(
-            weight_summary,
-            x="Rubbish Type",
-            y="Total Weight (kg)",
-            title="Total Weight Collected per Rubbish Type",
-            color="Rubbish Type",
-            text="Total Weight (kg)"
-        )
-        fig.update_traces(texttemplate='%{text:.2s}', textposition='outside')
-        fig.update_layout(uniformtext_minsize=8, uniformtext_mode='hide')
-        st.plotly_chart(fig, use_container_width=True)
+        if not uncollected_df.empty:
+            st.subheader("Notification Records")
+            display_df = uncollected_df.copy()
+            display_df = display_df.drop(['_id', 'isCollected'], axis=1, errors='ignore')
+            display_df.columns = ['Dustbin ID', 'Location', 'Time', 'Notification Type']
+            st.dataframe(display_df, use_container_width=True)
+        else:
+            st.info("All recycle items have been collected.")
     else:
-        st.info("No rubbish collection data available.")
+        st.info("No notifications available.")
 
 # Tab 3: Recycling Calculator
 with tab3:
@@ -287,24 +272,85 @@ with tab3:
         )
         st.plotly_chart(fig, use_container_width=True)
 
+# Tab 4: History (formerly Completion Tracker)
 with tab4:
-    st.header("Notifications")
+    st.header("Recycle History")
     
-    if not notification_df.empty:
-        # Display notifications
-        uncollected_df = notification_df[notification_df['isCollected'] == False]
+    col1, col2 = st.columns(2)
+    
+    if not collect_rubbish_df.empty:
+        # Show full collection history
+        st.subheader("Collection Records")
+        display_df = collect_rubbish_df.copy()
+        display_df = display_df.drop(['_id', 'image'], axis=1, errors='ignore')
+        display_df.columns = ['Dustbin ID', 'Time', 'Rubbish Type', 'Weight (kg)', 'Price (RM)']
+        st.dataframe(display_df, use_container_width=True)
 
-        if not uncollected_df.empty:
-            st.subheader("Notification Records")
-            display_df = uncollected_df.copy()
-            display_df = display_df.drop(['_id', 'isCollected'], axis=1, errors='ignore')
-            display_df.columns = ['Dustbin ID', 'Location', 'Time', 'Notification Type']
-            st.dataframe(display_df, use_container_width=True)
-        else:
-            st.info("All recycle items have been collected.")
+        # Rubbish type weight summary
+        st.subheader("Total Weight by Rubbish Type")
+
+        weight_summary = collect_rubbish_df.groupby("rubbish_type")["weight"].sum().reset_index()
+        weight_summary.columns = ["Rubbish Type", "Total Weight (kg)"]
+
+        fig = px.bar(
+            weight_summary,
+            x="Rubbish Type",
+            y="Total Weight (kg)",
+            title="Total Weight Collected per Rubbish Type",
+            color="Rubbish Type",
+            text="Total Weight (kg)"
+        )
+        fig.update_traces(texttemplate='%{text:.2s}', textposition='outside')
+        fig.update_layout(uniformtext_minsize=8, uniformtext_mode='hide')
+        st.plotly_chart(fig, use_container_width=True)
     else:
-        st.info("No notifications available.")
+        st.info("No rubbish collection data available.")
 
+# Tab 5: Product
+with tab5:
+    st.header("Smartbin Installation Order")
+
+    # Product info
+    product_name = "Smart Recycling Dustbin"
+    product_description = "This smart dustbin comes with a built-in ultrasonic sensor to detect fullness level and notifies admin when it needs to be collected. Eco-friendly and IoT-integrated."
+
+    # Layout
+    col1, col2 = st.columns([1, 2])
+
+    # Product Image
+    with col1:
+        st.image("images.jpeg", width=300, caption=product_name)
+
+    # Product Details and Quantity Selector
+    with col2:
+        st.subheader(product_name)
+        st.write(product_description)
+        st.markdown("**Price:** $120.00")
+
+        # Quantity Control
+        if "quantity" not in st.session_state:
+            st.session_state.quantity = 1
+
+        col_inc, col_q, col_dec = st.columns([1, 2, 1])
+
+        with col_dec:
+            if st.button("➖"):
+                if st.session_state.quantity > 1:
+                    st.session_state.quantity -= 1
+
+        with col_q:
+            st.markdown(f"<h3 style='text-align: center;'>{st.session_state.quantity}</h3>", unsafe_allow_html=True)
+
+        with col_inc:
+            if st.button("➕"):
+                st.session_state.quantity += 1
+
+        # Add to Cart or Confirm
+        if st.button("Add to Order"):
+            st.success(f"{st.session_state.quantity} unit(s) of '{product_name}' added to your order.")
+
+
+   
 # Footer
 st.markdown("---")
 st.caption("Waste Management Admin Dashboard | Last updated: " + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
