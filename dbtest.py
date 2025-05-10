@@ -2,7 +2,7 @@ from pymongo import MongoClient
 import pandas as pd
 
 # Database setup and connection
-client = MongoClient("mongodb+srv://easontan7285:nb2XBcriGVzT2QhF@cluster0.u7gxoah.mongodb.net/?tls=true")
+client = MongoClient("mongodb+srv://tengstc03:gnZkqiGDUmg0EgLE@cluster0.qj4ohkg.mongodb.net/?tls=true")
 db = client["smartbin"]
 
 # Collections
