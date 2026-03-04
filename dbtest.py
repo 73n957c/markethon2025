@@ -1,8 +1,12 @@
+import os
+from dotenv import load_dotenv 
 from pymongo import MongoClient
 import pandas as pd
 
+load_dotenv()
+
 # Database setup and connection
-client = MongoClient("mongodb+srv://tengstc03:gnZkqiGDUmg0EgLE@cluster0.qj4ohkg.mongodb.net/?tls=true")
+client = MongoClient(os.getenv("MONGO_URI"))
 db = client["smartbin"]
 
 # Collections

@@ -1,12 +1,16 @@
+import os
 import streamlit as st
 import pandas as pd
 import numpy as np
 import plotly.express as px
 import plotly.graph_objects as go
 from datetime import datetime, timedelta
+from dotenv import load_dotenv
 from pymongo import MongoClient
 import random
 import datetime
+
+load_dotenv()
 
 # Set page configuration
 st.set_page_config(
@@ -17,7 +21,7 @@ st.set_page_config(
 )
 
 # Database setup and connection
-client = MongoClient("mongodb+srv://tengstc03:gnZkqiGDUmg0EgLE@cluster0.qj4ohkg.mongodb.net/?tls=true")
+client = MongoClient(os.getenv("MONGO_URI"))
 db = client["smartbin"]
 
 # Collections

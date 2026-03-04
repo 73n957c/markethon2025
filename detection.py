@@ -1,13 +1,17 @@
+import os
 import serial
 import time
 import sys
 import msvcrt  # Use msvcrt for non-blocking input on Windows
+from dotenv import load_dotenv
 from pymongo import MongoClient
 import pandas as pd
 import datetime
 
+load_dotenv()
+
 # Database setup and connection
-client = MongoClient("mongodb+srv://tengstc03:gnZkqiGDUmg0EgLE@cluster0.qj4ohkg.mongodb.net/?tls=true")
+client = MongoClient(os.getenv("MONGO_URI"))
 db = client["smartbin"]
 
 # Collections
