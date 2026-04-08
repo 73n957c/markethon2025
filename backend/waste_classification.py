@@ -1,7 +1,5 @@
 from typing import Dict, List, Tuple
 
-from typing import Dict
-
 class WasteClassificationService:
     WASTE_CLASSIFICATION = {
         "Recyclables": ["brown-glass", "green-glass", "white-glass", "cardboard", "metal", "paper", "plastic"],
